@@ -23,7 +23,12 @@ function page:addPhrase(phrase)
 	local color = page.styles.default.color
 	local colorHover = page.styles.default.colorHover
 	
-	table.insert(self.phrases, {phrase, color, colorHover, "", ""}) -- text, normal color, hover color, action, data
+	table.insert(self.phrases, {
+		text = phrase,
+		color = color,
+		colorHover = colorHover,
+		action = "",
+		data = ""})
 	
 	return self
 end
@@ -36,13 +41,23 @@ function page:addPhraseN(phrase) -- adds phrase then a newline
 end
 
 function page:newLine()
-	table.insert(self.phrases, {"", "", "", "", ""})
+	table.insert(self.phrases, {
+		text = "",
+		color = "",
+		colorHover = "",
+		action = "",
+		data = ""})
 	
 	return self
 end
 
 function page:pageBottom()
-	table.insert(self.phrases, {"^", "", "", "", ""})
+	table.insert(self.phrases, {
+		text = "^",
+		color = "",
+		colorHover = "",
+		action = "",
+		data = ""})
 	
 	return self
 end
@@ -52,15 +67,15 @@ function page:style(name)
 	local phrase = self.phrases[#self.phrases]
 	
 	-- if the previous phrase was "" i.e. a newline, go to the page before that
-	if phrase[1] == "" then
+	if phrase.text == "" then
 		phrase = self.phrases[#self.phrases - 1]
 	end
 	
 	local color = page.styles[name].color
 	local colorHover = page.styles[name].colorHover
 	
-	phrase[2] = color
-	phrase[3] = colorHover
+	phrase.color = color
+	phrase.colorHover = colorHover
 	
 	return self
 end
@@ -73,17 +88,17 @@ function page:click(action, data)
 	local phrase = self.phrases[#self.phrases]
 	
 	-- if the previous phrase was "" i.e. a newline, go to the page before that
-	if phrase[1] == "" then
+	if phrase.text == "" then
 		phrase = self.phrases[#self.phrases - 1]
 	end
 	
 	local color = page.styles.action.color
 	local colorHover = page.styles.action.colorHover
 	
-	phrase[2] = color
-	phrase[3] = colorHover
-	phrase[4] = action
-	phrase[5] = data
+	phrase.color = color
+	phrase.colorHover = colorHover
+	phrase.action = action
+	phrase.data = data
 	
 	return self
 end

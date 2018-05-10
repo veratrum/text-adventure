@@ -74,13 +74,13 @@ end
 function game:changeRoom(id)
 	local room = util.searchByID(self.rooms, self.currentRoom)
 	
-	if room ~= nil then
-		self:executeAction("exit")
-	end
-	
 	local newRoom = util.searchByID(self.rooms, id)
 	
 	if newRoom ~= nil then
+		if room ~= nil then -- when setting the room for the first time there is no previous room
+			self:executeAction("exit")
+		end
+		
 		self.currentRoom = id
 		self.currentPage = 1
 		
