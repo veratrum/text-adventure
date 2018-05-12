@@ -1,22 +1,17 @@
-local inventory = {}
-inventory.__index = inventory
+local Inventory = Object:extend()
 
-function inventory.new()
-	local self = setmetatable({}, inventory)
-	
+function Inventory:new()
 	self.items = {}
-	
-	return self
 end
 
-function inventory:addItem(name, id, frequency)
-	local item = require("item")
+function Inventory:addItem(name, id, frequency)
+	local Item = require("item")
 	
 	local existingItem = util.searchByID(self.items, id)
 	if existingItem ~= nil then
 		existingItem:increaseFrequency(frequency)
 	else
-		local newItem = item.new(name, id)
+		local newItem = Item(name, id)
 		newItem:increaseFrequency(frequency - 1)
 		table.insert(self.items, newItem)
 	end
@@ -24,7 +19,7 @@ function inventory:addItem(name, id, frequency)
 	return self
 end
 
-function inventory:removeItem(id, frequency)
+function Inventory:removeItem(id, frequency)
 	local i = 1
 	local done = false
 	while i <= #self.items and not done do
@@ -47,8 +42,8 @@ function inventory:removeItem(id, frequency)
 	return self
 end
 
-function inventory:getItems()
+function Inventory:getItems()
 	return self.items
 end
 
-return inventory
+return Inventory

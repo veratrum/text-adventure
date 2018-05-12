@@ -1,7 +1,8 @@
 function love.load()
+	Object = require("classic")
 	Game = require("game")
 	
-	game = Game.new("greenlightning")
+	game = Game("greenlightning")
 end
 
 function love.draw()

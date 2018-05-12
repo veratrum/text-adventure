@@ -1,31 +1,26 @@
-local player = {}
-player.__index = player
+local Player = Object:extend()
 
-function player.new(name, id)
-	local self = setmetatable({}, player)
-	
-	local inventory = require("inventory")
+function Player:new(name, id)
+	local Inventory = require("inventory")
 	
 	self.name = name
 	self.id = id
-	self.inventory = inventory.new()
-	
-	return self
+	self.inventory = Inventory()
 end
 
-function player:getName()
+function Player:getName()
 	return self.name
 end
 
-function player:getID()
+function Player:getID()
 	return self.id
 end
 
-function player:getInventory()
+function Player:getInventory()
 	return self.inventory
 end
 
-function player:addToInventory(name, id, frequency)
+function Player:addToInventory(name, id, frequency)
 	local frequency = frequency or 1
 
 	self.inventory:addItem(name, id, frequency)
@@ -33,7 +28,7 @@ function player:addToInventory(name, id, frequency)
 	return self
 end
 
-function player:removeFromInventory(id, frequency)
+function Player:removeFromInventory(id, frequency)
 	local frequency = frequency or 1
 
 	self.inventory:removeItem(id, frequency)
@@ -41,4 +36,4 @@ function player:removeFromInventory(id, frequency)
 	return self
 end
 
-return player
+return Player

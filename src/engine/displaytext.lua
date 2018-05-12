@@ -1,9 +1,6 @@
-local displayText = {}
-displayText.__index = displayText
+local DisplayText = Object:extend()
 
-function displayText.new(phrase, xBegin, yBegin)
-	local self = setmetatable({}, displayText)
-	
+function DisplayText:new(phrase, xBegin, yBegin)
 	self.text = phrase.text
 	self.color = phrase.color
 	self.colorHover = phrase.colorHover
@@ -39,11 +36,9 @@ function displayText.new(phrase, xBegin, yBegin)
 	
 	self.xEnd = currentX
 	self.yEnd = currentY
-	
-	return self
 end
 
-function displayText:draw(mouseX, mouseY)
+function DisplayText:draw(mouseX, mouseY)
 	local ui = require("ui")
 	
 	love.graphics.setFont(boldFonts[12])
@@ -86,7 +81,7 @@ function displayText:draw(mouseX, mouseY)
 	end
 end
 
-function displayText:isHovered(mouseX, mouseY)
+function DisplayText:isHovered(mouseX, mouseY)
 	local ui = require("ui")
 	
 	if self.action == "" then
@@ -124,19 +119,19 @@ function displayText:isHovered(mouseX, mouseY)
 	return false
 end
 
-function displayText:getEndCoordinates()
+function DisplayText:getEndCoordinates()
 	return {
 		x = self.xEnd,
 		y = self.yEnd
 	}
 end
 
-function displayText:getAction()
+function DisplayText:getAction()
 	return self.action
 end
 
-function displayText:getData()
+function DisplayText:getData()
 	return self.data
 end
 
-return displayText
+return DisplayText

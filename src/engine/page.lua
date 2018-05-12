@@ -1,27 +1,22 @@
-local page = {}
-page.__index = page
+local Page = Object:extend()
 
-page.styles = {}
-page.styles["default"] = {
+Page.styles = {}
+Page.styles["default"] = {
 	color = "lgrey";
 	colorHover = "lgrey";
 }
-page.styles["action"] = {
+Page.styles["action"] = {
 	color = "gblue";
 	colorHover = "lblue";
 }
 
-function page.new()
-	local self = setmetatable({}, page)
-	
+function Page:new()
 	self.phrases = {}
-	
-	return self
 end
 
-function page:addPhrase(phrase)
-	local color = page.styles.default.color
-	local colorHover = page.styles.default.colorHover
+function Page:addPhrase(phrase)
+	local color = Page.styles.default.color
+	local colorHover = Page.styles.default.colorHover
 	
 	table.insert(self.phrases, {
 		text = phrase,
@@ -33,14 +28,14 @@ function page:addPhrase(phrase)
 	return self
 end
 
-function page:addPhraseN(phrase) -- adds phrase then a newline
+function Page:addPhraseN(phrase) -- adds phrase then a newline
 	self:addPhrase(phrase)
 	self:newLine()
 	
 	return self
 end
 
-function page:newLine()
+function Page:newLine()
 	table.insert(self.phrases, {
 		text = "",
 		color = "",
@@ -51,7 +46,7 @@ function page:newLine()
 	return self
 end
 
-function page:pageBottom()
+function Page:pageBottom()
 	table.insert(self.phrases, {
 		text = "^",
 		color = "",
@@ -62,17 +57,17 @@ function page:pageBottom()
 	return self
 end
 
--- must be cast after page:click otherwise click will overwrite it with the default action style
-function page:style(name)
+-- must be cast after Page:click otherwise click will overwrite it with the default action style
+function Page:style(name)
 	local phrase = self.phrases[#self.phrases]
 	
-	-- if the previous phrase was "" i.e. a newline, go to the page before that
+	-- if the previous phrase was "" i.e. a newline, go to the Page before that
 	if phrase.text == "" then
 		phrase = self.phrases[#self.phrases - 1]
 	end
 	
-	local color = page.styles[name].color
-	local colorHover = page.styles[name].colorHover
+	local color = Page.styles[name].color
+	local colorHover = Page.styles[name].colorHover
 	
 	phrase.color = color
 	phrase.colorHover = colorHover
@@ -82,18 +77,18 @@ end
 
 -- makes the last added phrase clickable upon which action is performed
 -- data is optional for example "go"ing to a different room where the room ID is data
-function page:click(action, data)
+function Page:click(action, data)
 	local data = data or ""
 	
 	local phrase = self.phrases[#self.phrases]
 	
-	-- if the previous phrase was "" i.e. a newline, go to the page before that
+	-- if the previous phrase was "" i.e. a newline, go to the Page before that
 	if phrase.text == "" then
 		phrase = self.phrases[#self.phrases - 1]
 	end
 	
-	local color = page.styles.action.color
-	local colorHover = page.styles.action.colorHover
+	local color = Page.styles.action.color
+	local colorHover = Page.styles.action.colorHover
 	
 	phrase.color = color
 	phrase.colorHover = colorHover
@@ -103,8 +98,8 @@ function page:click(action, data)
 	return self
 end
 
--- adds either or both previous and next page links to the page depending on the boolean parameters
-function page:pageLinks(previousPage, nextPage)
+-- adds either or both previous and next pageLinks to the Page depending on the boolean parameters
+function Page:pageLinks(previousPage, nextPage)
 	if previousPage and nextPage then
 		self:pageBottom()
 		self:addPhrase("<=="):click("previous")
@@ -120,17 +115,17 @@ function page:pageLinks(previousPage, nextPage)
 	return self
 end
 
-function page:removeLast(n) -- at this stage only used to overwrite pageLinks with a different form
+function Page:removeLast(n) -- at this stage only used to overwrite pageLinks with a different form
 	for i = 1, n do
 		table.remove(self.phrases, #self.phrases)
 	end
 end
 
-function page:getPhrases()
+function Page:getPhrases()
 	return self.phrases
 end
 
-function page:dumpT() -- debug
+function Page:dumpT() -- debug
 	print(util.dumpT(self.phrases))
 end
 
@@ -138,13 +133,13 @@ end
 -- special values:
 -- default: normal text
 -- action: normal action text
-function page.defineStyle(name, color, colorHover)
+function Page.defineStyle(name, color, colorHover)
 	local style = {
 		color = color;
 		colorHover = colorHover;
 	}
 	
-	page.styles[name] = style
+	Page.styles[name] = style
 end
 
-return page
+return Page

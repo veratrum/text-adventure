@@ -1,5 +1,4 @@
-local game = {}
-game.__index = game
+local Game = Object:extend()
 
 util = require("util")
 colors = require("colors")
@@ -7,16 +6,14 @@ colors = require("colors")
 -- gameData will generally stay the same and is there just to provide support for different games on the same engine
 -- there can be multiple saves for each game selected by the menu system
 
-function game.new(gameDataLocation)
-	local self = setmetatable({}, game)
-	
+function Game:new(gameDataLocation)
 	local UI = require("ui")
 	local gameData = require(gameDataLocation)
 
-	self.ui = UI.new()
+	self.ui = UI()
 	
-	self.rooms = gameData:createRooms()
-	self.players = gameData:createPlayers() -- represents multiple individuals you can control
+	self.rooms = gameData.createRooms()
+	self.players = gameData.createPlayers() -- represents multiple individuals you can control
 	self.plotVariables = gameData.createPlotVariables() -- flags that can change throughout the game
 	
 	--self.currentRoom = self.rooms[1]:getID() -- initialising this would make the starting room's exit action execute
@@ -27,51 +24,49 @@ function game.new(gameDataLocation)
 	
 	self:changeRoom(self.rooms[1]:getID())
 	self:updateUIInventory()
-	
-	return self
 end
 
-function game:draw()
+function Game:draw()
 	self.ui:draw()
 end
 
-function game:update(dt)
+function Game:update(dt)
 	self.ui:update(dt)
 end
 
-function game:keyPressed(key)
+function Game:keyPressed(key)
 	self.ui:keyPressed(key)
 end
 
-function game:mousePressed(x, y, button, isTouch)
+function Game:mousePressed(x, y, button, isTouch)
 	self.ui:mousePressed(x, y, button, isTouch)
 end
 
-function game:mouseReleased(x, y, button, isTouch)
+function Game:mouseReleased(x, y, button, isTouch)
 	self.ui:mouseReleased(x, y, button, isTouch)
 end
 
-function game:loadState(saveDataLocation) -- implement later
+function Game:loadState(saveDataLocation) -- implement later
 	loadData = require(saveDataLocation)
 end
 	
-function game:saveState(saveDataLocation) -- implement later
+function Game:saveState(saveDataLocation) -- implement later
 	-- write data to location
 end
 
-function game:getAllPages()
+function Game:getAllPages()
 	return self.currentPages
 end
 
-function game:nextPage()
+function Game:nextPage()
 	self.currentPage = self.currentPage + 1
 end
 
-function game:previousPage()
+function Game:previousPage()
 	self.currentPage = self.currentPage - 1
 end
 
-function game:changeRoom(id)
+function Game:changeRoom(id)
 	local room = util.searchByID(self.rooms, self.currentRoom)
 	
 	local newRoom = util.searchByID(self.rooms, id)
@@ -90,7 +85,7 @@ function game:changeRoom(id)
 	end
 end
 
-function game:executeAction(actionName, data)
+function Game:executeAction(actionName, data)
 	local room = util.searchByID(self.rooms, self.currentRoom)
 	
 	local action = room:getAction(actionName)
@@ -101,16 +96,16 @@ function game:executeAction(actionName, data)
 	self:updateUIPage()
 end
 
-function game:updateUIPage()
+function Game:updateUIPage()
 	local currentPage = self.currentPages[self.currentPage]
 
 	self.ui:setPage(currentPage)
 end
 
-function game:updateUIInventory()
+function Game:updateUIInventory()
 	local player = util.searchByID(self.players, self.currentPlayer)
 
 	self.ui:setInventory(player:getInventory())
 end
 
-return game
+return Game

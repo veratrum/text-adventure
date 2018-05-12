@@ -1,31 +1,26 @@
-local item = {}
-item.__index = item
+local Item = Object:extend()
 
-function item.new(name, id, frequency)
-	local self = setmetatable({}, item)
-	
+function Item:new(name, id, frequency)
 	local frequency = frequency or 1
 	
 	self.name = name
 	self.id = id
 	self.frequency = frequency
-	
-	return self
 end
 
-function item:getName()
+function Item:getName()
 	return self.name
 end
 
-function item:getID()
+function Item:getID()
 	return self.id
 end
 
-function item:getFrequency()
+function Item:getFrequency()
 	return self.frequency
 end
 
-function item:increaseFrequency(value)
+function Item:increaseFrequency(value)
 	self.frequency = self.frequency + value
 	
 	if self.frequency > 999 then
@@ -33,8 +28,8 @@ function item:increaseFrequency(value)
 	end
 end
 
-function item:decreaseFrequency(value)
+function Item:decreaseFrequency(value)
 	self.frequency = self.frequency - value
 end
 
-return item
+return Item

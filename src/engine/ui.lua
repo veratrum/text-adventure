@@ -1,8 +1,7 @@
-local ui = {}
-ui.__index = ui
+local UI = Object:extend()
 
-ui.windowWidth = 800
-ui.windowHeight = 600
+UI.windowWidth = 800
+UI.windowHeight = 600
 
 environmentX = -800
 environmentX2 = -800
@@ -17,20 +16,20 @@ fontSizes = {8, 10, 12, 16, 20, 24, 32, 48}
 
 offscreenBackgroundColor = {16, 16, 16}
 
-ui.fullScreenOffsetX = 0
-ui.fullScreenOffsetY = 0
-ui.textPaddingX = 48
-ui.textPaddingY = 24
-ui.extCursorX = textPaddingX
-ui.textCursorY = textPaddingY
-ui.characterWidth = 8
-ui.characterHeight = 24
-ui.pageBottomHeight = 600 - 18 - 12
+UI.fullScreenOffsetX = 0
+UI.fullScreenOffsetY = 0
+UI.textPaddingX = 48
+UI.textPaddingY = 24
+UI.extCursorX = textPaddingX
+UI.textCursorY = textPaddingY
+UI.characterWidth = 8
+UI.characterHeight = 24
+UI.pageBottomHeight = 600 - 18 - 12
 
 -- 88 rows
 -- 23 columns
-ui.totalRows = (ui.windowWidth - ui.textPaddingX * 2) / ui.characterWidth
-ui.totalColumns = (ui.windowHeight - ui.textPaddingY * 2) / ui.characterHeight
+UI.totalRows = (UI.windowWidth - UI.textPaddingX * 2) / UI.characterWidth
+UI.totalColumns = (UI.windowHeight - UI.textPaddingY * 2) / UI.characterHeight
 
 mouseX = 0
 mouseY = 0
@@ -43,19 +42,17 @@ hoveredFragmentIndex = -1;
 --phrases = {}
 --cursors = {}
 
-function ui.new()
-	local self = setmetatable({}, ui)
-	
+function UI:new()
 	love.window.setFullscreen(true, "desktop") -- "exclusive" for changing resolution
 	--love.window.setMode(windowWidth, windowHeight, {})
 	love.window.setTitle("Test")
 	
-	ui.fullScreenOffsetX = (love.graphics.getWidth() - ui.windowWidth) / 2
-	ui.fullScreenOffsetY = (love.graphics.getHeight() - ui.windowHeight) / 2
+	UI.fullScreenOffsetX = (love.graphics.getWidth() - UI.windowWidth) / 2
+	UI.fullScreenOffsetY = (love.graphics.getHeight() - UI.windowHeight) / 2
 	
-	ui.cursors = {}
-	ui.cursors.arrow = love.mouse.getSystemCursor("arrow")
-	ui.cursors.hand = love.mouse.getSystemCursor("hand")
+	UI.cursors = {}
+	UI.cursors.arrow = love.mouse.getSystemCursor("arrow")
+	UI.cursors.hand = love.mouse.getSystemCursor("hand")
 	
 	backgroundImage = love.graphics.newImage("img/background.png")
 	inventoryImage = love.graphics.newImage("img/inventory.png")
@@ -90,20 +87,18 @@ function ui.new()
 	
 	self.inventory = {}
 	self.displayTexts = {}
-	
-	return self
 end
 
-function ui:setPage(page)
+function UI:setPage(page)
 	local phrases = page:getPhrases()
 	
-	local displayText = require("displaytext");
+	local DisplayText = require("displaytext");
 	
 	self.displayTexts = {}
-	local currentX = ui.textPaddingX
-	local currentY = ui.textPaddingY
+	local currentX = UI.textPaddingX
+	local currentY = UI.textPaddingY
 	for i = 1, #phrases do
-		local dT = displayText.new(phrases[i], currentX, currentY)
+		local dT = DisplayText(phrases[i], currentX, currentY)
 		
 		currentPosition = dT:getEndCoordinates()
 		currentX = currentPosition.x
@@ -113,23 +108,23 @@ function ui:setPage(page)
 	end
 end
 
-function ui:setInventory(inventory)
+function UI:setInventory(inventory)
 	self.inventory = inventory
 end
 
-function ui:draw()
+function UI:draw()
 	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.draw(backgroundImage, ui.fullScreenOffsetX, ui.fullScreenOffsetY)
+	love.graphics.draw(backgroundImage, UI.fullScreenOffsetX, UI.fullScreenOffsetY)
 	
 	self:drawContent()
 	self:drawSideMenus()
 	
 	love.graphics.setFont(boldFonts[10])
 	love.graphics.setColor(colors["lgrey"])
-	love.graphics.print("fps: " .. tostring(love.timer.getFPS()), ui.fullScreenOffsetX + 750, ui.fullScreenOffsetY + 4)
+	love.graphics.print("fps: " .. tostring(love.timer.getFPS()), UI.fullScreenOffsetX + 750, UI.fullScreenOffsetY + 4)
 end
 
-function ui:drawContent()
+function UI:drawContent()
 	for i = 1, #self.displayTexts do
 		displayText = self.displayTexts[i]
 		
@@ -137,7 +132,7 @@ function ui:drawContent()
 	end
 end
 
-function ui:drawSideMenus()
+function UI:drawSideMenus()
 	love.graphics.setColor({255, 255, 255, 255})
 	
 	if environmentX ~= environmentX2 then
@@ -147,8 +142,8 @@ function ui:drawSideMenus()
 			environmentX = environmentX + 20
 		end
 		
-		love.graphics.draw(inventoryImage, ui.fullScreenOffsetX + inventoryX, ui.fullScreenOffsetY) -- ensure environment is drawn on top
-		love.graphics.draw(environmentImage, ui.fullScreenOffsetX + environmentX, ui.fullScreenOffsetY)
+		love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY) -- ensure environment is drawn on top
+		love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
 	end
 	
 	if inventoryX ~= inventoryX2 then
@@ -158,30 +153,30 @@ function ui:drawSideMenus()
 			inventoryX = inventoryX + 20
 		end
 		
-		love.graphics.draw(environmentImage, ui.fullScreenOffsetX + environmentX, ui.fullScreenOffsetY) -- ensure inventory is drawn on top
-		love.graphics.draw(inventoryImage, ui.fullScreenOffsetX + inventoryX, ui.fullScreenOffsetY)
+		love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY) -- ensure inventory is drawn on top
+		love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
 	end
 	
 	if environmentX == environmentX2 and inventoryX == inventoryX2 then
 		menuTransitioning = false
 	
 		if menuState == "left" then
-			love.graphics.draw(inventoryImage, ui.fullScreenOffsetX + inventoryX, ui.fullScreenOffsetY)
-			love.graphics.draw(environmentImage, ui.fullScreenOffsetX + environmentX, ui.fullScreenOffsetY)
+			love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
+			love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
 		else
-			love.graphics.draw(environmentImage, ui.fullScreenOffsetX + environmentX, ui.fullScreenOffsetY)
-			love.graphics.draw(inventoryImage, ui.fullScreenOffsetX + inventoryX, ui.fullScreenOffsetY)
+			love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
+			love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
 		end
 	end
 	
 	local items = self.inventory:getItems()
 	
-	local textCursorX = ui.textPaddingX + inventoryX + 100
-	local textCursorY = ui.textPaddingY
+	local textCursorX = UI.textPaddingX + inventoryX + 100
+	local textCursorY = UI.textPaddingY
 	
 	
-	self:printTextByCharacter(util.padCenter("Inventory", 94, " "), ui.fullScreenOffsetX + textCursorX, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["lgrey"], boldFonts[12])
-	textCursorY = textCursorY + ui.characterHeight * 2
+	self:printTextByCharacter(util.padCenter("Inventory", 94, " "), UI.fullScreenOffsetX + textCursorX, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["lgrey"], boldFonts[12])
+	textCursorY = textCursorY + UI.characterHeight * 2
 	
 	for i = 1, #items do
 		local item = items[i]
@@ -189,35 +184,35 @@ function ui:drawSideMenus()
 		local itemFrequency = item:getFrequency()
 		
 		love.graphics.setColor(colors["lgrey"])
-		love.graphics.print("[", ui.fullScreenOffsetX + textCursorX, ui.fullScreenOffsetY + textCursorY)
+		love.graphics.print("[", UI.fullScreenOffsetX + textCursorX, UI.fullScreenOffsetY + textCursorY)
 		
 		if itemFrequency > 99 then
-			self:printTextByCharacter(itemFrequency .. "", ui.fullScreenOffsetX + textCursorX + ui.characterWidth, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["red"], boldFonts[12])
+			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
 		elseif itemFrequency > 9 then
-			self:printTextByCharacter("0", ui.fullScreenOffsetX + textCursorX + ui.characterWidth, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["dgrey"], boldFonts[12])
-			self:printTextByCharacter(itemFrequency .. "", ui.fullScreenOffsetX + textCursorX + ui.characterWidth * 2, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["red"], boldFonts[12])
+			self:printTextByCharacter("0", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["dgrey"], boldFonts[12])
+			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 2, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
 		else
-			self:printTextByCharacter("00", ui.fullScreenOffsetX + textCursorX + ui.characterWidth, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["dgrey"], boldFonts[12])
-			self:printTextByCharacter(itemFrequency .. "", ui.fullScreenOffsetX + textCursorX + ui.characterWidth * 3, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["red"], boldFonts[12])
+			self:printTextByCharacter("00", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["dgrey"], boldFonts[12])
+			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 3, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
 		end
 		
-		self:printTextByCharacter("]", ui.fullScreenOffsetX + textCursorX + ui.characterWidth * 4, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["lgrey"], boldFonts[12])
+		self:printTextByCharacter("]", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 4, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["lgrey"], boldFonts[12])
 		
-		self:printTextByCharacter(itemName, ui.fullScreenOffsetX + textCursorX + ui.characterWidth * 6, ui.fullScreenOffsetY + textCursorY, ui.characterWidth, ui.characterHeight, colors["grey"], boldFonts[12])
+		self:printTextByCharacter(itemName, UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 6, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["grey"], boldFonts[12])
 			
-		textCursorY = textCursorY + ui.characterHeight
+		textCursorY = textCursorY + UI.characterHeight
 	end
 	
 	-- cover content outside fullscreen frame
 	love.graphics.setColor({offscreenBackgroundColor[1], offscreenBackgroundColor[2], offscreenBackgroundColor[3], 255})
-	love.graphics.rectangle("fill", ui.fullScreenOffsetX - 800, ui.fullScreenOffsetY, 800, 600)
-	love.graphics.rectangle("fill", ui.fullScreenOffsetX + 800, ui.fullScreenOffsetY, 800, 600)
+	love.graphics.rectangle("fill", UI.fullScreenOffsetX - 800, UI.fullScreenOffsetY, 800, 600)
+	love.graphics.rectangle("fill", UI.fullScreenOffsetX + 800, UI.fullScreenOffsetY, 800, 600)
 end
 
-function ui:update(dt)
+function UI:update(dt)
 	mouseX, mouseY = love.mouse.getPosition()
-	mouseX = mouseX - ui.fullScreenOffsetX
-	mouseY = mouseY - ui.fullScreenOffsetY
+	mouseX = mouseX - UI.fullScreenOffsetX
+	mouseY = mouseY - UI.fullScreenOffsetY
 	
 	local isAnyHovered = false
 	for i = 1, #self.displayTexts do
@@ -229,13 +224,13 @@ function ui:update(dt)
 	end
 	
 	if isAnyHovered then
-		love.mouse.setCursor(ui.cursors.hand)
+		love.mouse.setCursor(UI.cursors.hand)
 	else
-		love.mouse.setCursor(ui.cursors.arrow)
+		love.mouse.setCursor(UI.cursors.arrow)
 	end
 end
 
-function ui:keyPressed(key)
+function UI:keyPressed(key)
 	if menuState == "center" then
 		if key == "right" then
 			changeMenu("left")
@@ -253,11 +248,11 @@ function ui:keyPressed(key)
 	end
 end
 
-function ui:mousePressed(x, y, button, isTouch)
+function UI:mousePressed(x, y, button, isTouch)
 	
 end
 
-function ui:mouseReleased(x, y, button, isTouch)
+function UI:mouseReleased(x, y, button, isTouch)
 	local clickedIndex = -1
 	
 	for i = 1, #self.displayTexts do
@@ -299,7 +294,7 @@ function changeMenu(menu)
 end
 
 -- should probably refactor this whole text printing thing
-function ui:printTextByCharacter(text, x, y, width, height, color, font) -- only supports printing in a line (i.e. no word wrap)
+function UI:printTextByCharacter(text, x, y, width, height, color, font) -- only supports printing in a line (i.e. no word wrap)
 	love.graphics.setFont(font)
 	love.graphics.setColor(color)
 	
@@ -310,4 +305,4 @@ function ui:printTextByCharacter(text, x, y, width, height, color, font) -- only
 	end
 end
 
-return ui
+return UI
