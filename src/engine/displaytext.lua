@@ -10,26 +10,26 @@ function DisplayText:new(phrase, xBegin, yBegin)
 	self.xBegin = xBegin
 	self.yBegin = yBegin
 	
-	local ui = require("ui")
+	local UI = require("ui")
 	
 	local currentX = self.xBegin
 	local currentY = self.yBegin
 	
 	if self.text == "" then -- newline
-		currentX = ui.textPaddingX
-		currentY = currentY + ui.characterHeight
+		currentX = UI.textPaddingX
+		currentY = currentY + UI.characterHeight
 	elseif self.text == "^" then -- pagebottom
-		currentX = ui.textPaddingX
-		currentY = ui.pageBottomHeight
+		currentX = UI.textPaddingX
+		currentY = UI.pageBottomHeight
 	else
 		for i = 1, #self.text do
 			local character = self.text:sub(i, i)
 			
-			if currentX + ui.characterWidth >= ui.windowWidth - ui.textPaddingX then
-				currentX = ui.textPaddingX
-				currentY = currentY + ui.characterHeight
+			if currentX + UI.characterWidth >= UI.windowWidth - UI.textPaddingX then
+				currentX = UI.textPaddingX
+				currentY = currentY + UI.characterHeight
 			else
-				currentX = currentX + ui.characterWidth
+				currentX = currentX + UI.characterWidth
 			end
 		end
 	end
@@ -39,9 +39,9 @@ function DisplayText:new(phrase, xBegin, yBegin)
 end
 
 function DisplayText:draw(mouseX, mouseY)
-	local ui = require("ui")
+	local UI = require("ui")
 	
-	love.graphics.setFont(boldFonts[12])
+	love.graphics.setFont(UI.boldFonts[12])
 	
 	local hovered = self:isHovered(mouseX, mouseY)
 	
@@ -55,11 +55,11 @@ function DisplayText:draw(mouseX, mouseY)
 	local currentY = self.yBegin
 	
 	if self.text == "" then -- newline
-		currentX = ui.textPaddingX
-		currentY = currentY + ui.characterHeight
+		currentX = UI.textPaddingX
+		currentY = currentY + UI.characterHeight
 	elseif self.text == "^" then -- pagebottom
-		currentX = ui.textPaddingX
-		currentY = ui.pageBottomHeight
+		currentX = UI.textPaddingX
+		currentY = UI.pageBottomHeight
 	else
 		for i = 1, #self.text do
 			local character = self.text:sub(i, i)
@@ -69,20 +69,20 @@ function DisplayText:draw(mouseX, mouseY)
 			end
 			
 			love.graphics.setColor(textColor)
-			love.graphics.print(character, ui.fullScreenOffsetX + currentX, ui.fullScreenOffsetY + currentY)
+			love.graphics.print(character, UI.fullScreenOffsetX + currentX, UI.fullScreenOffsetY + currentY)
 			
-			if currentX + ui.characterWidth >= ui.windowWidth - ui.textPaddingX then
-				currentX = ui.textPaddingX
-				currentY = currentY + ui.characterHeight
+			if currentX + UI.characterWidth >= UI.windowWidth - UI.textPaddingX then
+				currentX = UI.textPaddingX
+				currentY = currentY + UI.characterHeight
 			else
-				currentX = currentX + ui.characterWidth
+				currentX = currentX + UI.characterWidth
 			end
 		end
 	end
 end
 
 function DisplayText:isHovered(mouseX, mouseY)
-	local ui = require("ui")
+	local UI = require("ui")
 	
 	if self.action == "" then
 		--return false
@@ -92,26 +92,26 @@ function DisplayText:isHovered(mouseX, mouseY)
 	local currentY = self.yBegin
 	
 	if self.text == "" then -- newline
-		currentX = ui.textPaddingX
-		currentY = currentY + ui.characterHeight
+		currentX = UI.textPaddingX
+		currentY = currentY + UI.characterHeight
 	elseif self.text == "^" then -- pagebottom
-		currentX = ui.textPaddingX
-		currentY = ui.pageBottomHeight
+		currentX = UI.textPaddingX
+		currentY = UI.pageBottomHeight
 	else
 		for i = 1, #self.text do
 			local character = self.text:sub(i, i)
 			
 			if character ~= "_" then
-				if mouseX >= currentX and mouseX < currentX + ui.characterWidth and mouseY >= currentY and mouseY < currentY + ui.characterHeight then
+				if mouseX >= currentX and mouseX < currentX + UI.characterWidth and mouseY >= currentY and mouseY < currentY + UI.characterHeight then
 					return true
 				end
 			end
 			
-			if currentX + ui.characterWidth >= ui.windowWidth - ui.textPaddingX then
-				currentX = ui.textPaddingX
-				currentY = currentY + ui.characterHeight
+			if currentX + UI.characterWidth >= UI.windowWidth - UI.textPaddingX then
+				currentX = UI.textPaddingX
+				currentY = currentY + UI.characterHeight
 			else
-				currentX = currentX + ui.characterWidth
+				currentX = currentX + UI.characterWidth
 			end
 		end
 	end

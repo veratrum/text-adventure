@@ -3,44 +3,29 @@ local UI = Object:extend()
 UI.windowWidth = 800
 UI.windowHeight = 600
 
-environmentX = -800
-environmentX2 = -800
-inventoryX = 700
-inventoryX2 = 700
+UI.environmentX = -800
+UI.environmentX2 = 0
+UI.inventoryX = 700
+UI.inventoryX2 = -100
+UI.menuSlideSpeed = 20
 
-normalFonts = {}
-boldFonts = {}
-normalPath = "font/DejaVuSansMono.ttf"
-boldPath = "font/DejaVuSansMono-Bold.ttf"
-fontSizes = {8, 10, 12, 16, 20, 24, 32, 48}
-
-offscreenBackgroundColor = {16, 16, 16}
+UI.normalFonts = {}
+UI.boldFonts = {}
+UI.normalPath = "font/DejaVuSansMono.ttf"
+UI.boldPath = "font/DejaVuSansMono-Bold.ttf"
+UI.fontSizes = {8, 10, 12, 16, 20, 24, 32, 48}
+UI.offscreenBackgroundColor = {16, 16, 16}
 
 UI.fullScreenOffsetX = 0
 UI.fullScreenOffsetY = 0
-UI.textPaddingX = 48
-UI.textPaddingY = 24
-UI.extCursorX = textPaddingX
-UI.textCursorY = textPaddingY
+UI.textPaddingX = 40
+UI.textPaddingY = 20
 UI.characterWidth = 8
-UI.characterHeight = 24
-UI.pageBottomHeight = 600 - 18 - 12
+UI.characterHeight = 20
+UI.pageBottomHeight = UI.windowHeight - UI.textPaddingY - UI.characterHeight / 2
 
--- 88 rows
--- 23 columns
-UI.totalRows = (UI.windowWidth - UI.textPaddingX * 2) / UI.characterWidth
-UI.totalColumns = (UI.windowHeight - UI.textPaddingY * 2) / UI.characterHeight
-
-mouseX = 0
-mouseY = 0
-
-menuState = "center"
-menuTransitioning = false
-
-hoveredFragmentIndex = -1;
-
---phrases = {}
---cursors = {}
+UI.totalColumns = (UI.windowWidth - UI.textPaddingX * 2) / UI.characterWidth
+UI.totalRows = (UI.windowHeight - UI.textPaddingY * 2) / UI.characterHeight
 
 function UI:new()
 	love.window.setFullscreen(true, "desktop") -- "exclusive" for changing resolution
@@ -54,36 +39,50 @@ function UI:new()
 	UI.cursors.arrow = love.mouse.getSystemCursor("arrow")
 	UI.cursors.hand = love.mouse.getSystemCursor("hand")
 	
-	backgroundImage = love.graphics.newImage("img/background.png")
-	inventoryImage = love.graphics.newImage("img/inventory.png")
-	environmentImage = love.graphics.newImage("img/environment.png")
+	UI.backgroundImage = love.graphics.newImage("img/background.png")
+	UI.inventoryImage = love.graphics.newImage("img/inventory.png")
+	UI.environmentImage = love.graphics.newImage("img/environment.png")
 	love.graphics.setNewFont(12)
 	love.graphics.setColor(0, 0, 0)
-	love.graphics.setBackgroundColor(offscreenBackgroundColor[1], offscreenBackgroundColor[2], offscreenBackgroundColor[3])
+	love.graphics.setBackgroundColor(UI.offscreenBackgroundColor[1], UI.offscreenBackgroundColor[2], UI.offscreenBackgroundColor[3])
 	
-	self.fontSizes = {8, 10, 12, 16, 20, 24, 48}
+	local SlideMenu = require("slidemenu")
+	local EnvironmentMenu = require("environmentmenu")
+	local InventoryMenu = require("inventorymenu")
+	self.environmentMenu = EnvironmentMenu(UI.environmentX, UI.environmentX2, UI.menuSlideSpeed, UI.environmentImage)
+	self.inventoryMenu = InventoryMenu(UI.inventoryX, UI.inventoryX2, UI.menuSlideSpeed, UI.inventoryImage)
+	print(self.environmentMenu.x1)
+	print(self.environmentMenu.x2)
+	print(self.inventoryMenu.x1)
+	print(self.inventoryMenu.x2)
+	
+	UI.fontSizes = {8, 10, 12, 16, 20, 24, 48}
 	
 	for i = 1, 7 do
-		normalFonts[i] = love.graphics.newFont(normalPath, fontSizes[i])
-		boldFonts[i] = love.graphics.newFont(boldPath, fontSizes[i])
+		UI.normalFonts[i] = love.graphics.newFont(UI.normalPath, UI.fontSizes[i])
+		UI.boldFonts[i] = love.graphics.newFont(UI.boldPath, UI.fontSizes[i])
 	end
 	
-	normalFonts[8] = love.graphics.newFont(normalPath, 8)
-	boldFonts[8] = love.graphics.newFont(boldPath, 8)
-	normalFonts[10] = love.graphics.newFont(normalPath, 10)
-	boldFonts[10] = love.graphics.newFont(boldPath, 10)
-	normalFonts[12] = love.graphics.newFont(normalPath, 12)
-	boldFonts[12] = love.graphics.newFont(boldPath, 12)
-	normalFonts[16] = love.graphics.newFont(normalPath, 16)
-	boldFonts[16] = love.graphics.newFont(boldPath, 16)
-	normalFonts[20] = love.graphics.newFont(normalPath, 20)
-	boldFonts[20] = love.graphics.newFont(boldPath, 20)
-	normalFonts[24] = love.graphics.newFont(normalPath, 24)
-	boldFonts[24] = love.graphics.newFont(boldPath, 24)
-	normalFonts[32] = love.graphics.newFont(normalPath, 32)
-	boldFonts[32] = love.graphics.newFont(boldPath, 32)
-	normalFonts[48] = love.graphics.newFont(normalPath, 48)
-	boldFonts[48] = love.graphics.newFont(boldPath, 48)
+	UI.normalFonts[8] = love.graphics.newFont(UI.normalPath, 8)
+	UI.boldFonts[8] = love.graphics.newFont(UI.boldPath, 8)
+	UI.normalFonts[10] = love.graphics.newFont(UI.normalPath, 10)
+	UI.boldFonts[10] = love.graphics.newFont(UI.boldPath, 10)
+	UI.normalFonts[12] = love.graphics.newFont(UI.normalPath, 12)
+	UI.boldFonts[12] = love.graphics.newFont(UI.boldPath, 12)
+	UI.normalFonts[16] = love.graphics.newFont(UI.normalPath, 16)
+	UI.boldFonts[16] = love.graphics.newFont(UI.boldPath, 16)
+	UI.normalFonts[20] = love.graphics.newFont(UI.normalPath, 20)
+	UI.boldFonts[20] = love.graphics.newFont(UI.boldPath, 20)
+	UI.normalFonts[24] = love.graphics.newFont(UI.normalPath, 24)
+	UI.boldFonts[24] = love.graphics.newFont(UI.boldPath, 24)
+	UI.normalFonts[32] = love.graphics.newFont(UI.normalPath, 32)
+	UI.boldFonts[32] = love.graphics.newFont(UI.boldPath, 32)
+	UI.normalFonts[48] = love.graphics.newFont(UI.normalPath, 48)
+	UI.boldFonts[48] = love.graphics.newFont(UI.boldPath, 48)
+	
+	self.mouseX = 0
+	self.mouseY = 0
+	self.menuState = "center"
 	
 	self.inventory = {}
 	self.displayTexts = {}
@@ -114,12 +113,12 @@ end
 
 function UI:draw()
 	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.draw(backgroundImage, UI.fullScreenOffsetX, UI.fullScreenOffsetY)
+	love.graphics.draw(UI.backgroundImage, UI.fullScreenOffsetX, UI.fullScreenOffsetY)
 	
 	self:drawContent()
 	self:drawSideMenus()
 	
-	love.graphics.setFont(boldFonts[10])
+	love.graphics.setFont(UI.boldFonts[10])
 	love.graphics.setColor(colors["lgrey"])
 	love.graphics.print("fps: " .. tostring(love.timer.getFPS()), UI.fullScreenOffsetX + 750, UI.fullScreenOffsetY + 4)
 end
@@ -133,78 +132,16 @@ function UI:drawContent()
 end
 
 function UI:drawSideMenus()
-	love.graphics.setColor({255, 255, 255, 255})
-	
-	if environmentX ~= environmentX2 then
-		if environmentX > environmentX2 then
-			environmentX = environmentX - 20
-		else
-			environmentX = environmentX + 20
-		end
-		
-		love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY) -- ensure environment is drawn on top
-		love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
-	end
-	
-	if inventoryX ~= inventoryX2 then
-		if inventoryX > inventoryX2 then
-			inventoryX = inventoryX - 20
-		else
-			inventoryX = inventoryX + 20
-		end
-		
-		love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY) -- ensure inventory is drawn on top
-		love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
-	end
-	
-	if environmentX == environmentX2 and inventoryX == inventoryX2 then
-		menuTransitioning = false
-	
-		if menuState == "left" then
-			love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
-			love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
-		else
-			love.graphics.draw(environmentImage, UI.fullScreenOffsetX + environmentX, UI.fullScreenOffsetY)
-			love.graphics.draw(inventoryImage, UI.fullScreenOffsetX + inventoryX, UI.fullScreenOffsetY)
-		end
-	end
-	
-	local items = self.inventory:getItems()
-	
-	local textCursorX = UI.textPaddingX + inventoryX + 100
-	local textCursorY = UI.textPaddingY
-	
-	
-	self:printTextByCharacter(util.padCenter("Inventory", 94, " "), UI.fullScreenOffsetX + textCursorX, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["lgrey"], boldFonts[12])
-	textCursorY = textCursorY + UI.characterHeight * 2
-	
-	for i = 1, #items do
-		local item = items[i]
-		local itemName = item:getName()
-		local itemFrequency = item:getFrequency()
-		
-		love.graphics.setColor(colors["lgrey"])
-		love.graphics.print("[", UI.fullScreenOffsetX + textCursorX, UI.fullScreenOffsetY + textCursorY)
-		
-		if itemFrequency > 99 then
-			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
-		elseif itemFrequency > 9 then
-			self:printTextByCharacter("0", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["dgrey"], boldFonts[12])
-			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 2, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
-		else
-			self:printTextByCharacter("00", UI.fullScreenOffsetX + textCursorX + UI.characterWidth, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["dgrey"], boldFonts[12])
-			self:printTextByCharacter(itemFrequency .. "", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 3, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["red"], boldFonts[12])
-		end
-		
-		self:printTextByCharacter("]", UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 4, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["lgrey"], boldFonts[12])
-		
-		self:printTextByCharacter(itemName, UI.fullScreenOffsetX + textCursorX + UI.characterWidth * 6, UI.fullScreenOffsetY + textCursorY, UI.characterWidth, UI.characterHeight, colors["grey"], boldFonts[12])
-			
-		textCursorY = textCursorY + UI.characterHeight
+	if self.menuState == "left" then
+		self.environmentMenu:draw(self.inventory)
+		self.inventoryMenu:draw(self.inventory)
+	else
+		self.inventoryMenu:draw(self.inventory)
+		self.environmentMenu:draw(self.inventory)
 	end
 	
 	-- cover content outside fullscreen frame
-	love.graphics.setColor({offscreenBackgroundColor[1], offscreenBackgroundColor[2], offscreenBackgroundColor[3], 255})
+	love.graphics.setColor({UI.offscreenBackgroundColor[1], UI.offscreenBackgroundColor[2], UI.offscreenBackgroundColor[3], 255})
 	love.graphics.rectangle("fill", UI.fullScreenOffsetX - 800, UI.fullScreenOffsetY, 800, 600)
 	love.graphics.rectangle("fill", UI.fullScreenOffsetX + 800, UI.fullScreenOffsetY, 800, 600)
 end
@@ -231,19 +168,19 @@ function UI:update(dt)
 end
 
 function UI:keyPressed(key)
-	if menuState == "center" then
+	if self.menuState == "center" then
 		if key == "right" then
-			changeMenu("left")
+			self:changeMenu("left")
 		elseif key == "left" then
-			changeMenu("right")
+			self:changeMenu("right")
 		end
-	elseif menuState == "left" then
+	elseif self.menuState == "left" then
 		if key == "left" then
-			changeMenu("center")
+			self:changeMenu("center")
 		end
-	elseif menuState == "right" then
+	elseif self.menuState == "right" then
 		if key == "right" then
-			changeMenu("center")
+			self:changeMenu("center")
 		end
 	end
 end
@@ -273,35 +210,18 @@ function UI:mouseReleased(x, y, button, isTouch)
 	end
 end
 
-function changeMenu(menu)
-	if menuTransitioning then
-		--return
-	end
-
-	menuState = menu
-	menuTransitioning = true
+function UI:changeMenu(menu)
+	self.menuState = menu
 	
-	if menuState == "center" then
-		environmentX2 = -800
-		inventoryX2 = 700
-	elseif menuState == "left" then
-		environmentX2 = 0
-		inventoryX2 = 700
-	elseif menuState == "right" then
-		environmentX2 = -800
-		inventoryX2 = -100
-	end
-end
-
--- should probably refactor this whole text printing thing
-function UI:printTextByCharacter(text, x, y, width, height, color, font) -- only supports printing in a line (i.e. no word wrap)
-	love.graphics.setFont(font)
-	love.graphics.setColor(color)
-	
-	for i = 1, #text do
-		love.graphics.print(string.sub(text, i, i), x, y)
-		
-		x = x + width
+	if self.menuState == "center" then
+		self.environmentMenu:moveOut()
+		self.inventoryMenu:moveOut()
+	elseif self.menuState == "left" then
+		self.environmentMenu:moveOut()
+		self.inventoryMenu:moveIn()
+	elseif self.menuState == "right" then
+		self.environmentMenu:moveIn()
+		self.inventoryMenu:moveOut()
 	end
 end
 
